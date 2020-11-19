@@ -10,21 +10,22 @@ from dotenv import load_dotenv
 
 app = Flask(__name__)
 
-mongo_url = os.getenv("mongo_url")
-dbname = os.getenv("database_name")
-mongo_store = MongoClient(mongo_url)
-metadata = mongo_store.dbname.metadata
+# mongo_url = os.getenv("mongo_url")
+# dbname = os.getenv("database_name")
+# mongo_store = MongoClient(mongo_url)
+# metadata = mongo_store.dbname.metadata
 
 bruh='test_collection'
-mongo_url ="54.226.235.138"
+# sample='user_collection'
+mongo_url ="52.207.207.58"
 dbname ='test'
 mongo_store = MongoClient(mongo_url)
 metadata = mongo_store.dbname.bruh
-
+# data = mongo_store.dbname.sample
 print(metadata.find({'price': '19.99'}))
 
 db = mysql.connector.connect(
-    host ='3.90.190.227',
+    host ='18.234.193.20',
     user = 'root',
     password = '',
     database = 'reviews'
