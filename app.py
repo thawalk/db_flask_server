@@ -18,7 +18,7 @@ app = Flask(__name__)
 
 bruh='test_collection'
 # sample='user_collection'
-mongo_url ="52.207.207.58"
+mongo_url ="54.211.223.244"
 dbname ='test'
 mongo_store = MongoClient(mongo_url)
 metadata = mongo_store.dbname.bruh
@@ -26,7 +26,7 @@ metadata = mongo_store.dbname.bruh
 print(metadata.find({'price': '19.99'}))
 
 db = mysql.connector.connect(
-    host ='18.234.193.20',
+    host ='52.87.158.130',
     user = 'root',
     password = '',
     database = 'reviews'
