@@ -28,7 +28,7 @@ db = mysql.connector.connect(
     host ='18.234.193.20',
     user = 'root',
     password = '',
-    database = 'reviews'
+    database = 'reviews',
     )
 
 
@@ -45,5 +45,6 @@ def api_root():
     response = Response(js, status=200, mimetype='application/json')
     return response
 
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=80)
+# if __name__ == '__main__':
+#     app.run(host="0.0.0.0", port=80)
+    # app.run(port=5000)
