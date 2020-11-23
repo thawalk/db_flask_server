@@ -1,4 +1,5 @@
 import json
+import pymongo
 from flask import Flask, jsonify, url_for, request, redirect,Response,Request
 # from flask_pymongo import PyMongo
 from pymongo import MongoClient
@@ -7,25 +8,48 @@ import mysql.connector
 from werkzeug.serving import run_simple
 import os
 from dotenv import load_dotenv
+import datetime
+# from flask_pymongo import PyMongo
 
 app = Flask(__name__)
 
 # mongo_url = os.getenv("mongo_url")
 # dbname = os.getenv("database_name")
 # mongo_store = MongoClient(mongo_url)
-# metadata = mongo_store.dbname.metadata
+# metadata = mongo_store.dbname.test
 
-bruh='test_collection'
-# sample='user_collection'
-mongo_url ="52.207.207.58"
-dbname ='test'
-mongo_store = MongoClient(mongo_url)
-metadata = mongo_store.dbname.bruh
-# data = mongo_store.dbname.sample
-print(metadata.find({'price': '19.99'}))
+# bruh='test_collection'
+# # sample='user_collection'
+# mongo_url ='mongodb://54.211.223.244'
+# dbname ='test'
+# mongo_store = MongoClient(mongo_url)
+# metadata = mongo_store.dbname.test_collection
+# print(metadata)
+# # data = mongo_store.dbname.sample
+# print(metadata.find({'price': '19.99'}))
+# print(metadata.count())
+
+# app.config["MONGO_URI"] = "mongodb://54.211.223.244:27017/test_collection"
+# mongo = PyMongo(app)
+
+# print(mongo.db.count())
+# print(mongo.db.test_collection.find({'price': '19.99'}))
+
+# reviews = mongo.db.test_collection.find({'asin': '1603420304'})
+# print(reviews)
+# arr1 = metadata.distinct('categories')
+# print(arr1)
+
+mongo = pymongo.MongoClient('mongodb://54.211.223.244:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false')
+db = pymongo.database.Database(mongo, 'test')
+col = pymongo.collection.Collection(db, 'test_collection')
+print(col.count())
+
+
+
 
 db = mysql.connector.connect(
-    host ='18.234.193.20',
+    host ='52.87.158.130',
     user = 'root',
     password = '',
     database = 'reviews',
@@ -45,6 +69,40 @@ def api_root():
     response = Response(js, status=200, mimetype='application/json')
     return response
 
-# if __name__ == '__main__':
-#     app.run(host="0.0.0.0", port=80)
-    # app.run(port=5000)
+#returns list of categories 
+@app.route('/categories', methods = ['GET'])
+def get_categories():
+    categories = []
+
+#Search for book using title, price or asin
+@app.route('/search', methods=['GET'])
+def search_book():
+    book = []
+    if title in request.args:
+        book = metadata.find({'title': title})
+    elif price in request.args:
+        book = metadata.find({'price':price})
+    elif asin in request.args:
+        book = metadata.find({'asin':asin})
+    if len(book) > 0:
+        msg = {'status': 200, 'message': 'book(s) successfully found', 'books': book}
+    else :
+        msg = {'status': 500, 'message': 'no books found with the following searches'}
+    return jsonify(msg)
+
+@app.route('/review', methods=['POST'])
+def add_review():
+    if not request.json or not request.json['asin'] or type(request.json['asin']) != str or not request.json['overall'] or not request.json['reviewText'] or type(request.json['reviewText']) != str  or not request.json['reviewTime'] or type(request.json['reviewTime']) != str or not request.json['reviewerID'] or type(request.json['reviewerID']) != str  or not request.json['reviewerName'] or type(request.json['reviewerName']) != str  or not request.json['summary'] or type(request.json['summary']) != str  or not request.json['unixReviewTime'] or type(request.json['unixReviewTime']) != int :
+        return 'invalid request msg', 404
+    txt = "INSERT INTO 'kindle_reviews' ('id', 'asin', 'overall', 'reviewText', 'reviewTime', 'reviewerID', 'reviewerName', 'summary', 'unixReviewTime') VALUES (%s)" 
+    values = (None, request.json['asin'], request.json['overall'], request.json['reviewText'], request.json['reviewTime'],  request.json['reviewerID'], request.json['reviewerName'], request.json['summary'], request.json['unixReviewTime'])
+    cur.execute(txt, values)
+
+    return 'successfully uploaded new review', 200
+
+
+    
+
+
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=80)
