@@ -1,2 +1,2 @@
-placer = "there"
-print(f"hello {placer}")
+import datetime
+print()

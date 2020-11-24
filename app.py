@@ -14,17 +14,24 @@ app = Flask(__name__)
 
 test_collection='test_collection'
 mongo = pymongo.MongoClient('mongodb://54.83.130.150:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false')
-db = pymongo.database.Database(mongo, 'test')
-metadata_col = pymongo.collection.Collection(db, 'test_collection')
+metadata_db = pymongo.database.Database(mongo, 'test')
+metadata_col = pymongo.collection.Collection(metadata_db, 'test_collection')
+userlogging_db = pymongo.database.Database(mongo,'user_analytics')
+userlogging_col = pymongo.collection.Collection(userlogging_db,'logging')
 
-db = mysql.connector.connect(
+metadata_db = mysql.connector.connect(
     host ='3.84.158.241',
     user = 'root',
     password = '',
     database = 'reviews',
     )
 
-cur = db.cursor()
+cur = metadata_db.cursor()
+
+def user_logging(userid,timestamp,req,res):
+    return userlogging_col.insert({"id":userid,"timestamp":timestamp,"request":req,"response":res})
+
+
 
 @app.route('/',methods=["GET"])
 def api_root():
@@ -33,6 +40,7 @@ def api_root():
     }
     js = json.dumps(data)
     response = Response(js, status=200, mimetype='application/json')
+    user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
     return response
 
 @app.route('/categories', methods = ['GET']) #TODO: #returns list of categories 
@@ -40,6 +48,7 @@ def get_categories():
     categories = []
     js = json.dumps(data)
     response = Response(js, status=200, mimetype='application/json')
+    user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
     return response
 
 @app.route('/search', methods=['GET'])  #now it only searches for TITLE. the mongo metadata does not have author
@@ -52,10 +61,12 @@ def search_book():
         print(result_array)
         js = json.dumps(result_array)
         response = Response(js, status=200, mimetype='application/json')
+        user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
         return response
     except:
         errMsg = "Please include title."
         js = json.dumps(errMsg)
+        user_logging(123,datetime.datetime.now().isoformat(),"GET",400)
         response = Response(js, status=400, mimetype='application/json')
         return response
 
@@ -86,11 +97,13 @@ def add_book():
         metadata_col.insert({"title":title,"asin":asin,"description":description,"price":price,"categories":categories})
         js = json.dumps(message)
         response = Response(js, status=201, mimetype='application/json')
+        user_logging(123,datetime.datetime.now().isoformat(),"POST",201)
         return response
     except:
         errMsg = "Please include title, asin, description, price and categories."
         js = json.dumps(errMsg)
         response = Response(js, status=400, mimetype='application/json')
+        user_logging(123,datetime.datetime.now().isoformat(),"POST",400)
         return response
 
 @app.route('/addReview',methods = ['POST']) #TODO: add review INTO sql part
@@ -109,15 +122,17 @@ def add_review():
         mySQL_insert_query = f"""INSERT INTO reviews.kindle_reviews (asin, helpful, overall, reviewText, reviewTime, reviewerID, reviewerName, summary, unixReviewTime)
 VALUES ("{asin}","{helpful}",{overall},"{reviewText}","{reviewTime}","{reviewerID}","{reviewerName}","{summary}","{unixReviewTime}");"""    
         cur.execute(mySQL_insert_query)
-        db.commit()
+        metadata_db.commit()
         message = "Successfully uploaded review"
         js = json.dumps(message)
         response = Response(js, status=201, mimetype='application/json')
+        user_logging(123,datetime.datetime.now().isoformat(),"POST",201)
         return response
     except:
         errMsg = "An error occurred. Please check if you have all fields."
         js = json.dumps(errMsg)
         response = Response(js, status=400, mimetype='application/json')
+        user_logging(123,datetime.datetime.now().isoformat(),"POST",400)
         return response
 
 @app.route('/sortByGenres', methods= ['GET']) #TODO: sort by genres from mongo metadata categories
@@ -139,12 +154,14 @@ def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
                for i, value in enumerate(row)) for row in result_set]
         js = json.dumps(r)
         response = Response(js, status=200, mimetype='application/json')
+        user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
         return response
         
     except:
         errMsg = "An error occurred. Please check if you have all fields."
         js = json.dumps(errMsg)
         response = Response(js, status=400, mimetype='application/json')
+        user_logging(123,datetime.datetime.now().isoformat(),"GET",400)
         return response
 
 
