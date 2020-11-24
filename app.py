@@ -1,6 +1,5 @@
 import json
 from flask import Flask, jsonify, url_for, request, redirect,Response,Request
-# from flask_pymongo import PyMongo
 import pymongo
 from bson.json_util import dumps
 import mysql.connector
@@ -13,23 +12,18 @@ import time
 app = Flask(__name__)
 
 test_collection='test_collection'
-# sample='user_collection'
-mongo = pymongo.MongoClient('mongodb://34.238.241.158:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false')
+mongo = pymongo.MongoClient('mongodb://54.83.130.150:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false')
 db = pymongo.database.Database(mongo, 'test')
 metadata_col = pymongo.collection.Collection(db, 'test_collection')
 
 db = mysql.connector.connect(
-    host ='18.233.97.90',
+    host ='3.84.158.241',
     user = 'root',
     password = '',
     database = 'reviews'
     )
 
-
 cur = db.cursor()
-# cur.execute("SELECT asin from kindle_reviews group by asin order by avg(overall) desc limit 9 ")
-# print(cur.fetchall())
-# print("above fetch all")
 
 @app.route('/',methods=["GET"])
 def api_root():
@@ -40,22 +34,30 @@ def api_root():
     response = Response(js, status=200, mimetype='application/json')
     return response
 
-#returns list of categories 
-@app.route('/categories', methods = ['GET'])
+@app.route('/categories', methods = ['GET']) #TODO: #returns list of categories 
 def get_categories():
     categories = []
     js = json.dumps(data)
     response = Response(js, status=200, mimetype='application/json')
     return response
 
-#Search for book using title, price or asin
-@app.route('/search', methods=['GET'])  #TODO: search for book by author or title from mongo 
+@app.route('/search', methods=['GET'])  #now it only searches for TITLE. the mongo metadata does not have author
 def search_book():
-    data = dumps(list(metadata_col.find().limit(10)))
-    print(data)
-    js = json.dumps(data)
-    response = Response(js, status=200, mimetype='application/json')
-    return response
+    try:
+        data = request.json
+        title = data["title"]
+        result = metadata_col.find({"title":title})
+        result_array = dumps(list(result))
+        print(result_array)
+        js = json.dumps(result_array)
+        response = Response(js, status=200, mimetype='application/json')
+        return response
+    except:
+        errMsg = "Please include title."
+        js = json.dumps(errMsg)
+        response = Response(js, status=400, mimetype='application/json')
+        return response
+
 
 
 # @app.route('/review', methods=['POST'])
@@ -88,19 +90,14 @@ def add_book():
         response = Response(js, status=400, mimetype='application/json')
         return response
 
-@app.route('/addReview',methods = ['POST']): #TODO: add review INTO sql part
+@app.route('/addReview',methods = ['POST']) #TODO: add review INTO sql part
 def add_review():
-
+    data
 
 @app.route('/sortByGenres', methods= ['GET']) #TODO: sort by genres from mongo metadata categories
 def sort_by_genres():
-
-
-
-
-    
-
+    pass
 
 if __name__ == '__main__':
-    # app.run(host="0.0.0.0", port=80)
+    # app.run(host="0.0.0.0", port=80)   #remember to change this part
     app.run(debug=True)
