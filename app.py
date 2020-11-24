@@ -73,6 +73,8 @@ def search_book():
 
 @app.route('/addBook',methods= ['POST'])
 def add_book():
+    # if not request.json or not request.json['asin'] or type(request.json['asin']) != str or not request.json['overall'] or not request.json['reviewText'] or type(request.json['reviewText']) != str  or not request.json['reviewTime'] or type(request.json['reviewTime']) != str or not request.json['reviewerID'] or type(request.json['reviewerID']) != str  or not request.json['reviewerName'] or type(request.json['reviewerName']) != str  or not request.json['summary'] or type(request.json['summary']) != str  or not request.json['unixReviewTime'] or type(request.json['unixReviewTime']) != int :
+    #     return 'invalid request msg', 404
     try:
         data = request.json
         title = data['title']
@@ -104,9 +106,9 @@ def add_review():
         reviewerName = data["reviewerName"]
         summary = data["summary"]
         unixReviewTime = int(time.time())
-        mySQL_insert_query2 = f"""INSERT INTO reviews.kindle_reviews (asin, helpful, overall, reviewText, reviewTime, reviewerID, reviewerName, summary, unixReviewTime)
+        mySQL_insert_query = f"""INSERT INTO reviews.kindle_reviews (asin, helpful, overall, reviewText, reviewTime, reviewerID, reviewerName, summary, unixReviewTime)
 VALUES ("{asin}","{helpful}",{overall},"{reviewText}","{reviewTime}","{reviewerID}","{reviewerName}","{summary}","{unixReviewTime}");"""    
-        cur.execute(mySQL_insert_query2)
+        cur.execute(mySQL_insert_query)
         db.commit()
         message = "Successfully uploaded review"
         js = json.dumps(message)
@@ -117,15 +119,35 @@ VALUES ("{asin}","{helpful}",{overall},"{reviewText}","{reviewTime}","{reviewerI
         js = json.dumps(errMsg)
         response = Response(js, status=400, mimetype='application/json')
         return response
-   
-
-        
-
-
 
 @app.route('/sortByGenres', methods= ['GET']) #TODO: sort by genres from mongo metadata categories
 def sort_by_genres():
     pass
+
+@app.route('/sortByRating' , methods = ['GET'])
+def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
+    try:
+        data = request.json
+        rating_preference = data['rating_preference']
+        if(rating_preference == 'increasing'): #means rating 1 will come out first
+            mySQL_sort_query = """SELECT * FROM reviews.kindle_reviews ORDER BY overall ASC LIMIT 10;"""
+        else: #means rating 5 will come out first
+            mySQL_sort_query = """SELECT * FROM reviews.kindle_reviews ORDER BY overall DESC LIMIT 10;"""
+        cur.execute(mySQL_sort_query)
+        result_set = cur.fetchall()
+        r = [dict((cur.description[i][0], value) \
+               for i, value in enumerate(row)) for row in result_set]
+        js = json.dumps(r)
+        response = Response(js, status=200, mimetype='application/json')
+        return response
+        
+    except:
+        errMsg = "An error occurred. Please check if you have all fields."
+        js = json.dumps(errMsg)
+        response = Response(js, status=400, mimetype='application/json')
+        return response
+
+
 
 if __name__ == '__main__':
     # app.run(host="0.0.0.0", port=80)   #remember to change this part
