@@ -1,4 +1,5 @@
 import json
+import pymongo
 from flask import Flask, jsonify, url_for, request, redirect,Response,Request
 import pymongo
 from bson.json_util import dumps
@@ -20,7 +21,7 @@ db = mysql.connector.connect(
     host ='3.84.158.241',
     user = 'root',
     password = '',
-    database = 'reviews'
+    database = 'reviews',
     )
 
 cur = db.cursor()
