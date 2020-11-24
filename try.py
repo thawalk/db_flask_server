@@ -1,3 +1,2 @@
-flaggerino = ""
-if(not flaggerino):
-    print("hi")
+placer = "there"
+print(f"hello {placer}")

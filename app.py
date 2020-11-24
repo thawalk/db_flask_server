@@ -93,7 +93,35 @@ def add_book():
 
 @app.route('/addReview',methods = ['POST']) #TODO: add review INTO sql part
 def add_review():
-    data
+    try:
+        data = request.json
+        asin = data["asin"]
+        helpful = [0,0]
+        overall = data["overall"]
+        reviewText = data["reviewText"]
+        reviewTime = data["reviewTime"]
+        reviewerID = data["reviewerID"]
+        reviewerName = data["reviewerName"]
+        summary = data["summary"]
+        unixReviewTime = int(time.time())
+        mySQL_insert_query2 = f"""INSERT INTO reviews.kindle_reviews (asin, helpful, overall, reviewText, reviewTime, reviewerID, reviewerName, summary, unixReviewTime)
+VALUES ("{asin}","{helpful}",{overall},"{reviewText}","{reviewTime}","{reviewerID}","{reviewerName}","{summary}","{unixReviewTime}");"""    
+        cur.execute(mySQL_insert_query2)
+        db.commit()
+        message = "Successfully uploaded review"
+        js = json.dumps(message)
+        response = Response(js, status=201, mimetype='application/json')
+        return response
+    except:
+        errMsg = "An error occurred. Please check if you have all fields."
+        js = json.dumps(errMsg)
+        response = Response(js, status=400, mimetype='application/json')
+        return response
+   
+
+        
+
+
 
 @app.route('/sortByGenres', methods= ['GET']) #TODO: sort by genres from mongo metadata categories
 def sort_by_genres():
