@@ -56,8 +56,7 @@ def get_categories():
 @app.route('/search', methods=['GET'])  #now it only searches for TITLE. the mongo metadata does not have author
 def search_book():
     try:
-        data = request.json
-        title = data["title"]
+        title = request.args.get("title")
         result = metadata_col.find({"title":title})
         result_array = dumps(list(result))
         print(result_array)
@@ -144,8 +143,7 @@ def sort_by_genres():
 @app.route('/sortByRating' , methods = ['GET'])
 def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
     try:
-        data = request.json
-        rating_preference = data['rating_preference']
+        rating_preference = request.args.get("rating_preference")
         if(rating_preference == 'increasing'): #means rating 1 will come out first
             mySQL_sort_query = """SELECT * FROM reviews.kindle_reviews ORDER BY overall ASC LIMIT 10;"""
         else: #means rating 5 will come out first
@@ -169,5 +167,5 @@ def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=80)   #remember to change this part
-    # app.run(debug=True)
+    # app.run(host="0.0.0.0", port=80)   #remember to change this part
+    app.run(debug=True)
