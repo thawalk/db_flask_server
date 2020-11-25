@@ -9,8 +9,10 @@ import os
 from dotenv import load_dotenv
 import datetime
 import time
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 test_collection='test_collection'
 mongo = pymongo.MongoClient('mongodb://54.83.130.150:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false')
