@@ -59,9 +59,7 @@ def search_book():
         title = request.args.get("title")
         result = metadata_col.find({"title":title})
         result_array = dumps(list(result))
-        print(result_array)
-        js = json.dumps(result_array)
-        response = Response(js, status=200, mimetype='application/json')
+        response = Response(result_array, status=200, mimetype='application/json')
         user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
         return response
     except:
@@ -167,5 +165,5 @@ def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=80)   #remember to change this part
-    # app.run(debug=True)
+    # app.run(host="0.0.0.0", port=80)   #remember to change this part
+    app.run(debug=True)
