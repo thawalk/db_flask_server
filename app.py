@@ -13,22 +13,38 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
+load_dotenv()
 
 test_collection='test_collection'
-mongo = pymongo.MongoClient('mongodb://18.209.236.31:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false')
+# mongo = pymongo.MongoClient('mongodb://18.209.236.31:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false')
+mongo = pymongo.MongoClient('mongodb://{}:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false'.format(os.getenv("mongo_url")))
 metadata_db = pymongo.database.Database(mongo, 'test')
 metadata_col = pymongo.collection.Collection(metadata_db, 'test_collection')
 userlogging_db = pymongo.database.Database(mongo,'user_analytics')
 userlogging_col = pymongo.collection.Collection(userlogging_db,'logging')
 
+print(metadata_col.count())
+
+# metadata_db = mysql.connector.connect(
+#     host ='54.163.143.77',
+#     user = 'root',
+#     password = '',
+#     database = 'reviews',
+#     )
 metadata_db = mysql.connector.connect(
-    host ='54.163.143.77',
+    host = os.getenv("host"),
     user = 'root',
     password = '',
     database = 'reviews',
     )
 
 cur = metadata_db.cursor()
+
+# mySQL_sort_query = """SELECT * FROM reviews.kindle_reviews ORDER BY overall ASC LIMIT 10;"""
+# cur.execute(mySQL_sort_query)
+# result_set = cur.fetchall()
+# print(result_set)
+
 
 def user_logging(userid,timestamp,req,res):
     return userlogging_col.insert({"id":userid,"timestamp":timestamp,"request":req,"response":res})
@@ -105,34 +121,33 @@ def add_book():
         user_logging(123,datetime.datetime.now().isoformat(),"POST",400)
         return response
 
-@app.route('/addReview',methods = ['POST']) #TODO: add review INTO sql part
-def add_review():
-    try:
-        data = request.json
-        asin = data["asin"]
-        helpful = [0,0]
-        overall = data["overall"]
-        reviewText = data["reviewText"]
-        reviewTime = data["reviewTime"]
-        reviewerID = data["reviewerID"]
-        reviewerName = data["reviewerName"]
-        summary = data["summary"]
-        unixReviewTime = int(time.time())
-        mySQL_insert_query = f"""INSERT INTO reviews.kindle_reviews (asin, helpful, overall, reviewText, reviewTime, reviewerID, reviewerName, summary, unixReviewTime)
-VALUES ("{asin}","{helpful}",{overall},"{reviewText}","{reviewTime}","{reviewerID}","{reviewerName}","{summary}","{unixReviewTime}");"""    
-        cur.execute(mySQL_insert_query)
-        metadata_db.commit()
-        message = "Successfully uploaded review"
-        js = json.dumps(message)
-        response = Response(js, status=201, mimetype='application/json')
-        user_logging(123,datetime.datetime.now().isoformat(),"POST",201)
-        return response
-    except:
-        errMsg = "An error occurred. Please check if you have all fields."
-        js = json.dumps(errMsg)
-        response = Response(js, status=400, mimetype='application/json')
-        user_logging(123,datetime.datetime.now().isoformat(),"POST",400)
-        return response
+# @app.route('/addReview',methods = ['POST']) #TODO: add review INTO sql part
+# def add_review():
+#     try:
+#         data = request.json
+#         asin = data["asin"]
+#         helpful = [0,0]
+#         overall = data["overall"]
+#         reviewText = data["reviewText"]
+#         reviewTime = data["reviewTime"]
+#         reviewerID = data["reviewerID"]
+#         reviewerName = data["reviewerName"]
+#         summary = data["summary"]
+#         unixReviewTime = int(time.time())
+#         mySQL_insert_query = f"""INSERT INTO reviews.kindle_reviews (asin, helpful, overall, reviewText, reviewTime, reviewerID, reviewerName, summary, unixReviewTime) VALUES ("{asin}","{helpful}",{overall},"{reviewText}","{reviewTime}","{reviewerID}","{reviewerName}","{summary}","{unixReviewTime}");"""    
+#         cur.execute(mySQL_insert_query)
+#         metadata_db.commit()
+#         message = "Successfully uploaded review"
+#         js = json.dumps(message)
+#         response = Response(js, status=201, mimetype='application/json')
+#         user_logging(123,datetime.datetime.now().isoformat(),"POST",201)
+#         return response
+#     except:
+#         errMsg = "An error occurred. Please check if you have all fields."
+#         js = json.dumps(errMsg)
+#         response = Response(js, status=400, mimetype='application/json')
+#         user_logging(123,datetime.datetime.now().isoformat(),"POST",400)
+#         return response
 
 @app.route('/sortByGenres', methods= ['GET']) #TODO: sort by genres from mongo metadata categories
 def sort_by_genres():
