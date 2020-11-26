@@ -57,7 +57,7 @@ def get_categories():
 def search_book():
     try:
         title = request.args.get("title")
-        result = metadata_col.find({ $text: { $search: title } }).limit(10) #{"title":title}
+        result = metadata_col.find({"title":title}).limit(10) #{ $text: { $search: title } }
         result_array = dumps(list(result)) 
         response = Response(result_array, status=200, mimetype='application/json')
         user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
