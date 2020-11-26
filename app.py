@@ -15,14 +15,14 @@ app = Flask(__name__)
 CORS(app)
 
 test_collection='test_collection'
-mongo = pymongo.MongoClient('mongodb://54.83.130.150:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false')
+mongo = pymongo.MongoClient('mongodb://18.209.236.31:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false')
 metadata_db = pymongo.database.Database(mongo, 'test')
 metadata_col = pymongo.collection.Collection(metadata_db, 'test_collection')
 userlogging_db = pymongo.database.Database(mongo,'user_analytics')
 userlogging_col = pymongo.collection.Collection(userlogging_db,'logging')
 
 metadata_db = mysql.connector.connect(
-    host ='3.84.158.241',
+    host ='54.163.143.77',
     user = 'root',
     password = '',
     database = 'reviews',
@@ -57,8 +57,8 @@ def get_categories():
 def search_book():
     try:
         title = request.args.get("title")
-        result = metadata_col.find({"title":title})
-        result_array = dumps(list(result))
+        result = metadata_col.find({ $text: { $search: title } }).limit(10) #{"title":title}
+        result_array = dumps(list(result)) 
         response = Response(result_array, status=200, mimetype='application/json')
         user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
         return response
