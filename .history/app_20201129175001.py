@@ -101,7 +101,7 @@ def search_book():
     try:
         title = request.args.get("title")
         author = request.args.get("author")
-        result = bookdetails_col.find({"$or":[{"book_title":title},{"author_names":author}]}).limit(10) #{ $text: { $search: title } }
+        result = bookdetails_col.find({"$or"}).limit(10) #{ $text: { $search: title } }
         result_array = dumps(list(result)) 
         response = Response(result_array, status=200, mimetype='application/json')
         user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
@@ -208,5 +208,5 @@ def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000)   #remember to change this part
-    # app.run(debug=True)
+    # app.run(host="0.0.0.0", port=5000)   #remember to change this part
+    app.run(debug=True)

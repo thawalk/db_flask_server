@@ -22,12 +22,8 @@ metadata_db = pymongo.database.Database(mongo, 'test')
 metadata_col = pymongo.collection.Collection(metadata_db, 'test_collection')
 userlogging_db = pymongo.database.Database(mongo,'user_analytics')
 userlogging_col = pymongo.collection.Collection(userlogging_db,'logging')
-bookdetails_db = pymongo.database.Database(mongo,'extra')
-bookdetails_col = pymongo.collection.Collection(bookdetails_db,'book_details_collection')
 
-
-print(userlogging_col.count())
-print(bookdetails_col.count())
+# print(metadata_col.count())
 
 metadata_db = mysql.connector.connect(
     host ='54.163.143.77',
@@ -67,23 +63,14 @@ def api_root():
 
 @app.route('/reviews/<ASIN>' ,methods = ['GET'])
 def get_review_by_ASIN(ASIN):
-    try:
-        mySQL_search_asin_query = f"""SELECT * FROM reviews.kindle_reviews WHERE asin = "{ASIN}"  """
-        print(mySQL_search_asin_query)
-        cur.execute(mySQL_search_asin_query)
-        result_set = cur.fetchall()
-        r = [dict((cur.description[i][0], value) \
-                for i, value in enumerate(row)) for row in result_set]
-        js = json.dumps(r)
-        response = Response(js, status=200, mimetype='application/json')
-        user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
-        return response
-    except:
-        errMsg = "An error occurred. Please try again."
-        js = json.dumps(errMsg)
-        user_logging(123,datetime.datetime.now().isoformat(),"GET",400)
-        response = Response(js, status=400, mimetype='application/json')
-        return response
+    print(ASIN)
+    data = {
+        ASIN:ASIN
+    }
+    js = json.dumps(data)
+    response = Response(js, status=200, mimetype='application/json')
+    user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
+    return response
     
 
 
@@ -95,13 +82,11 @@ def get_categories():
     user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
     return response
 
-
 @app.route('/search', methods=['GET'])  #now it only searches for TITLE. the mongo metadata does not have author
 def search_book():
     try:
         title = request.args.get("title")
-        author = request.args.get("author")
-        result = bookdetails_col.find({"$or":[{"book_title":title},{"author_names":author}]}).limit(10) #{ $text: { $search: title } }
+        result = metadata_col.findOne({"title":{"$regex":title}}).limit(10) #{ $text: { $search: title } }
         result_array = dumps(list(result)) 
         response = Response(result_array, status=200, mimetype='application/json')
         user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
@@ -208,5 +193,5 @@ def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000)   #remember to change this part
-    # app.run(debug=True)
+    # app.run(host="0.0.0.0", port=5000)   #remember to change this part
+    app.run(debug=True)

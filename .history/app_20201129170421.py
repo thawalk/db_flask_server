@@ -22,12 +22,10 @@ metadata_db = pymongo.database.Database(mongo, 'test')
 metadata_col = pymongo.collection.Collection(metadata_db, 'test_collection')
 userlogging_db = pymongo.database.Database(mongo,'user_analytics')
 userlogging_col = pymongo.collection.Collection(userlogging_db,'logging')
-bookdetails_db = pymongo.database.Database(mongo,'extra')
-bookdetails_col = pymongo.collection.Collection(bookdetails_db,'book_details_collection')
+bookdetails_db = pymongo.database.Database(mongo, 'extra')
+bookdetails_db = pymongo.database.Database(mongo,'user_analytics')
 
-
-print(userlogging_col.count())
-print(bookdetails_col.count())
+# print(metadata_col.count())
 
 metadata_db = mysql.connector.connect(
     host ='54.163.143.77',
@@ -100,8 +98,7 @@ def get_categories():
 def search_book():
     try:
         title = request.args.get("title")
-        author = request.args.get("author")
-        result = bookdetails_col.find({"$or":[{"book_title":title},{"author_names":author}]}).limit(10) #{ $text: { $search: title } }
+        result = metadata_col.findOne({"title":{"$regex":title}}).limit(10) #{ $text: { $search: title } }
         result_array = dumps(list(result)) 
         response = Response(result_array, status=200, mimetype='application/json')
         user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
@@ -208,5 +205,5 @@ def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000)   #remember to change this part
-    # app.run(debug=True)
+    # app.run(host="0.0.0.0", port=5000)   #remember to change this part
+    app.run(debug=True)
