@@ -63,8 +63,24 @@ def api_root():
 
 @app.route('/reviews/<ASIN>' ,methods = ['GET'])
 def get_review_by_ASIN(ASIN):
-    print(ASIN)
-    return 
+    try:
+        mySQL_search_asin_query = f"""SELECT * FROM reviews.kindle_reviews WHERE asin = "{ASIN}"  """
+        print(mySQL_search_asin_query)
+        cur.execute(mySQL_search_asin_query)
+        result_set = cur.fetchall()
+        r = [dict((cur.description[i][0], value) \
+                for i, value in enumerate(row)) for row in result_set]
+        js = json.dumps(r)
+        response = Response(js, status=200, mimetype='application/json')
+        user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
+        return response
+    except:
+        errMsg = "An error occurred. Please try again."
+        js = json.dumps(errMsg)
+        user_logging(123,datetime.datetime.now().isoformat(),"GET",400)
+        response = Response(js, status=400, mimetype='application/json')
+        return response
+    
 
 
 @app.route('/categories', methods = ['GET']) #TODO: #returns list of categories 
@@ -74,6 +90,7 @@ def get_categories():
     response = Response(js, status=200, mimetype='application/json')
     user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
     return response
+
 
 @app.route('/search', methods=['GET'])  #now it only searches for TITLE. the mongo metadata does not have author
 def search_book():
@@ -186,5 +203,5 @@ def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000)   #remember to change this part
-    # app.run(debug=True)
+    # app.run(host="0.0.0.0", port=5000)   #remember to change this part
+    app.run(debug=True)
