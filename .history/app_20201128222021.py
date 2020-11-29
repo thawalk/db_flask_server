@@ -61,12 +61,6 @@ def api_root():
     user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
     return response
 
-@app.route('/reviews/<ASIN>' ,methods = ['GET'])
-def get_review_by_ASIN(ASIN):
-    print(ASIN)
-    return 
-
-
 @app.route('/categories', methods = ['GET']) #TODO: #returns list of categories 
 def get_categories():
     categories = []
@@ -79,7 +73,7 @@ def get_categories():
 def search_book():
     try:
         title = request.args.get("title")
-        result = metadata_col.findOne({"title":{"$regex":title}}).limit(10) #{ $text: { $search: title } }
+        result = metadata_col.find({"title":title}).limit(10) #{ $text: { $search: title } }
         result_array = dumps(list(result)) 
         response = Response(result_array, status=200, mimetype='application/json')
         user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
@@ -127,33 +121,33 @@ def add_book():
         user_logging(123,datetime.datetime.now().isoformat(),"POST",400)
         return response
 
-@app.route('/addReview',methods = ['POST']) #TODO: add review INTO sql part
-def add_review():
-    try:
-        data = request.json
-        asin = data["asin"]
-        helpful = [0,0]
-        overall = data["overall"]
-        reviewText = data["reviewText"]
-        reviewTime = data["reviewTime"]
-        reviewerID = data["reviewerID"]
-        reviewerName = data["reviewerName"]
-        summary = data["summary"]
-        unixReviewTime = int(time.time())
-        mySQL_insert_query = f"""INSERT INTO reviews.kindle_reviews (asin, helpful, overall, reviewText, reviewTime, reviewerID, reviewerName, summary, unixReviewTime) VALUES ("{asin}","{helpful}",{overall},"{reviewText}","{reviewTime}","{reviewerID}","{reviewerName}","{summary}","{unixReviewTime}");"""    
-        cur.execute(mySQL_insert_query)
-        metadata_db.commit()
-        message = "Successfully uploaded review"
-        js = json.dumps(message)
-        response = Response(js, status=201, mimetype='application/json')
-        user_logging(123,datetime.datetime.now().isoformat(),"POST",201)
-        return response
-    except:
-        errMsg = "An error occurred. Please check if you have all fields."
-        js = json.dumps(errMsg)
-        response = Response(js, status=400, mimetype='application/json')
-        user_logging(123,datetime.datetime.now().isoformat(),"POST",400)
-        return response
+# @app.route('/addReview',methods = ['POST']) #TODO: add review INTO sql part
+# def add_review():
+#     try:
+#         data = request.json
+#         asin = data["asin"]
+#         helpful = [0,0]
+#         overall = data["overall"]
+#         reviewText = data["reviewText"]
+#         reviewTime = data["reviewTime"]
+#         reviewerID = data["reviewerID"]
+#         reviewerName = data["reviewerName"]
+#         summary = data["summary"]
+#         unixReviewTime = int(time.time())
+#         mySQL_insert_query = f"""INSERT INTO reviews.kindle_reviews (asin, helpful, overall, reviewText, reviewTime, reviewerID, reviewerName, summary, unixReviewTime) VALUES ("{asin}","{helpful}",{overall},"{reviewText}","{reviewTime}","{reviewerID}","{reviewerName}","{summary}","{unixReviewTime}");"""    
+#         cur.execute(mySQL_insert_query)
+#         metadata_db.commit()
+#         message = "Successfully uploaded review"
+#         js = json.dumps(message)
+#         response = Response(js, status=201, mimetype='application/json')
+#         user_logging(123,datetime.datetime.now().isoformat(),"POST",201)
+#         return response
+#     except:
+#         errMsg = "An error occurred. Please check if you have all fields."
+#         js = json.dumps(errMsg)
+#         response = Response(js, status=400, mimetype='application/json')
+#         user_logging(123,datetime.datetime.now().isoformat(),"POST",400)
+#         return response
 
 @app.route('/sortByGenres', methods= ['GET']) #TODO: sort by genres from mongo metadata categories
 def sort_by_genres():

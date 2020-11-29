@@ -63,8 +63,6 @@ def api_root():
 
 @app.route('/reviews/<ASIN>' ,methods = ['GET'])
 def get_review_by_ASIN(ASIN):
-    print(ASIN)
-    return 
 
 
 @app.route('/categories', methods = ['GET']) #TODO: #returns list of categories 

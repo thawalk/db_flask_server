@@ -61,12 +61,6 @@ def api_root():
     user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
     return response
 
-@app.route('/reviews/<ASIN>' ,methods = ['GET'])
-def get_review_by_ASIN(ASIN):
-    print(ASIN)
-    return 
-
-
 @app.route('/categories', methods = ['GET']) #TODO: #returns list of categories 
 def get_categories():
     categories = []
@@ -132,7 +126,7 @@ def add_review():
     try:
         data = request.json
         asin = data["asin"]
-        helpful = [0,0]
+        helpful = "[0,0]
         overall = data["overall"]
         reviewText = data["reviewText"]
         reviewTime = data["reviewTime"]

@@ -61,12 +61,6 @@ def api_root():
     user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
     return response
 
-@app.route('/reviews/<ASIN>' ,methods = ['GET'])
-def get_review_by_ASIN(ASIN):
-    print(ASIN)
-    return 
-
-
 @app.route('/categories', methods = ['GET']) #TODO: #returns list of categories 
 def get_categories():
     categories = []
@@ -79,7 +73,7 @@ def get_categories():
 def search_book():
     try:
         title = request.args.get("title")
-        result = metadata_col.findOne({"title":{"$regex":title}}).limit(10) #{ $text: { $search: title } }
+        result = metadata_col.findOne({"title":{$regex:title}}).limit(10) #{ $text: { $search: title } }
         result_array = dumps(list(result)) 
         response = Response(result_array, status=200, mimetype='application/json')
         user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
