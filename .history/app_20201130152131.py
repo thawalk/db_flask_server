@@ -213,15 +213,12 @@ def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
             asin = data['asin']
             met = metadata_col.find({"asin":asin}).limit(1)
             metadata = list(met)
-            extra = bookdetails_col.find({"asin":asin}).limit(1)
-            extra_details = list(extra)
             data['price'] = metadata[0]['price']
             data['imUrl'] = metadata[0]['imUrl']
-            # data['description'] = metadata[0]['description']
-            data['book_title'] = 'The Golden Phoenix' #extra_details[0]['book_title']    #uncomment after Jy give data
-            data['author_names'] = 'Eric Bold' #extra_details[0]['author_names']
-
+            data['description'] = metadata[0]['description']
             final_result.append(data)
+            
+
         js = json.dumps(final_result)
         response = Response(js, status=200, mimetype='application/json')
         user_logging(123,datetime.datetime.now().isoformat(),"GET",200)

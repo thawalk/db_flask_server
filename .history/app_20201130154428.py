@@ -218,8 +218,8 @@ def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
             data['price'] = metadata[0]['price']
             data['imUrl'] = metadata[0]['imUrl']
             # data['description'] = metadata[0]['description']
-            data['book_title'] = 'The Golden Phoenix' #extra_details[0]['book_title']    #uncomment after Jy give data
-            data['author_names'] = 'Eric Bold' #extra_details[0]['author_names']
+            data['book_title'] = ''#extra_details[0]['book_title']    #uncomment after Jy give data
+            data['author_names'] = ''#extra_details[0]['author_names']
 
             final_result.append(data)
         js = json.dumps(final_result)
