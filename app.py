@@ -10,6 +10,8 @@ from dotenv import load_dotenv
 import datetime
 import time
 from flask_cors import CORS
+import re
+import sys
 
 app = Flask(__name__)
 CORS(app)
@@ -101,8 +103,21 @@ def search_book():
     try:
         title = request.args.get("title")
         author = request.args.get("author")
-        result = bookdetails_col.find({"$or":[{"book_title":title},{"author_names":author}]}).limit(10) #{ $text: { $search: title } }
-        result_array = dumps(list(result)) 
+        pattern = re.compile(f'({title})', re.I)
+        result = bookdetails_col.find({"$or":[{"book_title":{'$regex': pattern}},{"author_names":author}]}).limit(10) #{ $text: { $search: title } }
+        temp_result_array = list(result)
+        final_result = []
+        for data in temp_result_array:
+            asin = data['asin']
+            a = metadata_col.find({"asin":asin}).limit(10)
+            
+            a_list = list(a)
+            # print(a_list[0], file=sys.stderr)
+            a_list[0]['book_title'] = data['book_title']
+            a_list[0]['author_names'] = data['author_names']
+            final_result.append(a_list[0])
+        result_array = dumps(final_result)
+        print(final_result, file=sys.stderr)
         response = Response(result_array, status=200, mimetype='application/json')
         user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
         return response
@@ -170,9 +185,9 @@ def add_review():
         response = Response(js, status=201, mimetype='application/json')
         user_logging(123,datetime.datetime.now().isoformat(),"POST",201)
         return response
-    except:
+    except Exception as e:
         errMsg = "An error occurred. Please check if you have all fields."
-        js = json.dumps(errMsg)
+        js = json.dumps(e)
         response = Response(js, status=400, mimetype='application/json')
         user_logging(123,datetime.datetime.now().isoformat(),"POST",400)
         return response
@@ -208,5 +223,5 @@ def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000)   #remember to change this part
-    # app.run(debug=True)
+    #app.run(host="0.0.0.0", port=5000)   #remember to change this part
+    app.run(debug=True)
