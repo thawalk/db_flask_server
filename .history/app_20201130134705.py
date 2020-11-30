@@ -203,7 +203,7 @@ def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
         if(rating_preference == 'increasing'): #means rating 1 will come out first
             mySQL_sort_query = """SELECT asin as asin,CAST(AVG(overall) AS CHAR) as rating FROM reviews.kindle_reviews GROUP BY asin ORDER BY AVG(overall) ASC limit 10;"""
         else: #means rating 5 will come out first
-            mySQL_sort_query = """SELECT asin as asin,CAST(AVG(overall) AS CHAR) as rating FROM reviews.kindle_reviews GROUP BY asin ORDER BY AVG(overall) DESC limit 10;"""
+            mySQL_sort_query = """SELECT * FROM reviews.kindle_reviews ORDER BY overall DESC LIMIT 10;"""
         cur.execute(mySQL_sort_query)
         result_set = cur.fetchall()
         r = [dict((cur.description[i][0], value) \
