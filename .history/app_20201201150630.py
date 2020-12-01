@@ -81,7 +81,7 @@ def get_review_by_ASIN(ASIN):
         user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
         return response
     except Exception as e:
-        errMsg = "An error occurred. Please try again. Error: " + e 
+        errMsg = "An error occurred. Please try again." 
         js = json.dumps(errMsg)
         user_logging(123,datetime.datetime.now().isoformat(),"GET",400)
         response = Response(js, status=400, mimetype='application/json')
@@ -238,5 +238,5 @@ def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000)   #remember to change this part
-    # app.run(debug=True)
+    #app.run(host="0.0.0.0", port=5000)   #remember to change this part
+    app.run(debug=True)

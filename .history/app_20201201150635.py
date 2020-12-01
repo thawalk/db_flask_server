@@ -238,5 +238,5 @@ def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000)   #remember to change this part
-    # app.run(debug=True)
+    #app.run(host="0.0.0.0", port=5000)   #remember to change this part
+    app.run(debug=True)
