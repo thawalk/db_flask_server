@@ -194,7 +194,33 @@ def add_review():
 
 @app.route('/sortByGenres', methods= ['GET']) #TODO: sort by genres from mongo metadata categories
 def sort_by_genres():
-    pass
+    try : 
+        genre = str(request.args['genre'])
+        met = metadata_col.find({'categories':{'$elemMatch':{'$elemMatch':{'$in':[genre]}}}}).limit(1)
+        meta = list(met)
+        # print(meta)
+        final = []
+        for data in meta:
+            asin = data['asin']
+            extra = bookdetails_col.find({'asin':asin}).limit(4)
+            extra_details = list(extra)
+            print(extra_details)
+            data['book_title'] = 'Life of Akmol' #extra_details[0]['book_title']
+            data['author_names'] = 'Hakim Teo' #extra_details[0]['author_names']
+            del data['_id']
+            final.append(data)
+        # print(final)
+        js = json.dumps(final)
+        response = Response(js, status=200, mimetype='application/json')
+        user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
+        return response
+    except Exception as e:
+        print(e)
+        errMsg = "An error occurred. Please check if you have all fields."
+        js = json.dumps(errMsg)
+        response = Response(js, status=400, mimetype='application/json')
+        user_logging(123,datetime.datetime.now().isoformat(),"GET",400)
+        return response
 
 @app.route('/sortByRating' , methods = ['GET'])
 def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
