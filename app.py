@@ -18,7 +18,7 @@ CORS(app)
 load_dotenv()
 
 test_collection='test_collection'
-# mongo = pymongo.MongoClient('mongodb://34.202.163.159:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false')
+# mongo = pymongo.MongoClient('mongodb://3.239.125.13:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false')
 mongo = pymongo.MongoClient('mongodb://{}:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false'.format(os.getenv("mongo_url")))
 metadata_db = pymongo.database.Database(mongo, 'test')
 metadata_col = pymongo.collection.Collection(metadata_db, 'test_collection')
@@ -32,7 +32,7 @@ print(userlogging_col.count())
 print(bookdetails_col.count())
 
 # metadata_db = mysql.connector.connect(
-#     host ='54.196.224.124',
+#     host ='3.237.43.107',
 #     user = 'root',
 #     password = '',
 #     database = 'reviews',
@@ -229,7 +229,7 @@ def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
         if(rating_preference == 'increasing'): #means rating 1 will come out first
             mySQL_sort_query = """SELECT asin as asin,CAST(AVG(overall) AS CHAR) as rating FROM reviews.kindle_reviews GROUP BY asin ORDER BY AVG(overall) ASC limit 10;"""
         else: #means rating 5 will come out first
-            mySQL_sort_query = """SELECT asin as asin,CAST(AVG(overall) AS CHAR) as rating FROM reviews.kindle_reviews GROUP BY asin ORDER BY AVG(overall) DESC limit 10;"""
+            mySQL_sort_query = """SELECT asin as asin,CAST(AVG(overall) AS CHAR) as rating FROM reviews.kindle_reviews GROUP BY asin ORDER BY AVG(overall) DESC, asin ASC limit 10;"""
         cur.execute(mySQL_sort_query)
         result_set = cur.fetchall()
         r = [dict((cur.description[i][0], value) \
