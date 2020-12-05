@@ -18,7 +18,7 @@ CORS(app)
 load_dotenv()
 
 test_collection='test_collection'
-# mongo = pymongo.MongoClient('mongodb://18.209.236.31:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false')
+# mongo = pymongo.MongoClient('mongodb://34.202.163.159:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false')
 mongo = pymongo.MongoClient('mongodb://{}:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false'.format(os.getenv("mongo_url")))
 metadata_db = pymongo.database.Database(mongo, 'test')
 metadata_col = pymongo.collection.Collection(metadata_db, 'test_collection')
@@ -32,7 +32,7 @@ print(userlogging_col.count())
 print(bookdetails_col.count())
 
 # metadata_db = mysql.connector.connect(
-#     host ='54.163.143.77',
+#     host ='54.196.224.124',
 #     user = 'root',
 #     password = '',
 #     database = 'reviews',
@@ -234,18 +234,23 @@ def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
         result_set = cur.fetchall()
         r = [dict((cur.description[i][0], value) \
                for i, value in enumerate(row)) for row in result_set]
+        print('list of books: ',result_set )
         final_result = []
+        print(r)
         for data in r:
             asin = data['asin']
             met = metadata_col.find({"asin":asin}).limit(1)
             metadata = list(met)
             extra = bookdetails_col.find({"asin":asin}).limit(1)
             extra_details = list(extra)
+            # print('data',data)
+            # print('metadata', metadata)
+            # print('extradetails',extra_details)
             data['price'] = metadata[0]['price']
             data['imUrl'] = metadata[0]['imUrl']
             # data['description'] = metadata[0]['description']
-            data['book_title'] = 'The Golden Phoenix' #extra_details[0]['book_title']    #uncomment after Jy give data
-            data['author_names'] = 'Eric Bold' #extra_details[0]['author_names']
+            data['book_title'] =  extra_details[0]['book_title']    #uncomment after Jy give data 'The Golden Phoenix'
+            data['author_names'] = extra_details[0]['author_names'] #'Eric Bold' 
 
             final_result.append(data)
         js = json.dumps(final_result)
