@@ -196,18 +196,19 @@ def add_review():
 def sort_by_genres():
     try : 
         genre = str(request.args['genre'])
-        met = metadata_col.find({'categories':{'$elemMatch':{'$elemMatch':{'$in':[genre]}}}}).limit(1)
+        met = metadata_col.find({'categories':{'$elemMatch':{'$elemMatch':{'$in':[genre]}}}}).limit(10)
         meta = list(met)
-        # print(meta)
+        print(meta)
         final = []
         for data in meta:
             asin = data['asin']
-            extra = bookdetails_col.find({'asin':asin}).limit(4)
+            print(asin)
+            extra = bookdetails_col.find({'asin':asin}).limit(1)
             extra_details = list(extra)
-            print(extra_details)
-            data['book_title'] = 'Life of Akmol' #extra_details[0]['book_title']
-            data['author_names'] = 'Hakim Teo' #extra_details[0]['author_names']
-            del data['_id']
+            # print(extra_details)
+            data['book_title'] = extra_details[0]['book_title'] #'Life of Akmol' #
+            data['author_names'] = extra_details[0]['author_names'] #'Hakim Teo' #
+            # del data['_id']
             final.append(data)
         # print(final)
         js = json.dumps(final)
@@ -229,7 +230,7 @@ def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
         if(rating_preference == 'increasing'): #means rating 1 will come out first
             mySQL_sort_query = """SELECT asin as asin,CAST(AVG(overall) AS CHAR) as rating FROM reviews.kindle_reviews GROUP BY asin ORDER BY AVG(overall) ASC limit 10;"""
         else: #means rating 5 will come out first
-            mySQL_sort_query = """SELECT asin as asin,CAST(AVG(overall) AS CHAR) as rating FROM reviews.kindle_reviews GROUP BY asin ORDER BY AVG(overall) DESC, asin ASC limit 10;"""
+            mySQL_sort_query = """SELECT asin as asin,CAST(AVG(overall) AS CHAR) as rating FROM reviews.kindle_reviews GROUP BY asin ORDER BY AVG(overall) DESC, asin ASC limit 10;"""        
         cur.execute(mySQL_sort_query)
         result_set = cur.fetchall()
         r = [dict((cur.description[i][0], value) \
