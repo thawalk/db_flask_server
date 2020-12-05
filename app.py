@@ -227,9 +227,9 @@ def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
     try:
         rating_preference = request.args.get("rating_preference")
         if(rating_preference == 'increasing'): #means rating 1 will come out first
-            mySQL_sort_query = """SELECT asin as asin,CAST(AVG(overall) AS CHAR) as rating FROM reviews.kindle_reviews GROUP BY asin ORDER BY AVG(overall) ASC limit 2;"""
+            mySQL_sort_query = """SELECT asin as asin,CAST(AVG(overall) AS CHAR) as rating FROM reviews.kindle_reviews GROUP BY asin ORDER BY AVG(overall) ASC limit 10;"""
         else: #means rating 5 will come out first
-            mySQL_sort_query = """SELECT asin as asin,CAST(AVG(overall) AS CHAR) as rating FROM reviews.kindle_reviews GROUP BY asin ORDER BY AVG(overall) DESC limit 2;"""
+            mySQL_sort_query = """SELECT asin as asin,CAST(AVG(overall) AS CHAR) as rating FROM reviews.kindle_reviews GROUP BY asin ORDER BY AVG(overall) DESC limit 10;"""
         cur.execute(mySQL_sort_query)
         result_set = cur.fetchall()
         r = [dict((cur.description[i][0], value) \
@@ -255,7 +255,7 @@ def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
         
     except Exception as e:
         print(e)
-        errMsg = "An error occurred. Please check if you have all fields."
+        errMsg = "An error occurred. Please check if you have all fields." + e
         js = json.dumps(errMsg)
         response = Response(js, status=400, mimetype='application/json')
         user_logging(123,datetime.datetime.now().isoformat(),"GET",400)
