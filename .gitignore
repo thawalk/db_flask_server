@@ -1,2 +1,5 @@
 analytics_functions.py
 flask-boto.py
+flask-try.pem
+analytics_functions.pyc
+.env
