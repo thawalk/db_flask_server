@@ -117,13 +117,13 @@ def search_book():
             # print(a_list[0], file=sys.stderr)
             # if a_list[0]['book_title']!=null:
             # print(a_list[0]['book_title'])
-            print("data is : "+ data)
-            if(data['book_title'] is None):
-                print("ALERT")
-            if(data['author_names'] is None):
-                print("ALERT")
-            print(data['book_title'])
-            print(data['author_names'])
+            # print("data is : "+ data)
+            # if(data['book_title'] is None):
+            #     print("ALERT")
+            # if(data['author_names'] is None):
+            #     print("ALERT")
+            # print(data['book_title'])
+            # print(data['author_names'])
             a_list[0]['book_title'] = data['book_title']
             # if 
             a_list[0]['author_names'] = data['author_names']
