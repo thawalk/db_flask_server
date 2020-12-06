@@ -112,21 +112,15 @@ def search_book():
         for data in temp_result_array:
             asin = data['asin']
             a = metadata_col.find({"asin":asin}).limit(10)
-            
             a_list = list(a)
-            # print(a_list[0], file=sys.stderr)
-            # if a_list[0]['book_title']!=null:
-            # print(a_list[0]['book_title'])
-            # print("data is : "+ data)
-            # if(data['book_title'] is None):
-            #     print("ALERT")
-            # if(data['author_names'] is None):
-            #     print("ALERT")
-            # print(data['book_title'])
-            # print(data['author_names'])
-            a_list[0]['book_title'] = data['book_title']
-            # if 
-            a_list[0]['author_names'] = data['author_names']
+            try:
+                a_list[0]['book_title'] = data['book_title']
+            except: 
+                a_list[0]['book_title'] = ''
+            try:
+                a_list[0]['author_names'] = data['author_names']
+            except:
+                a_list[0]['author_names'] = ''
             final_result.append(a_list[0])
         result_array = dumps(final_result)
         print(final_result, file=sys.stderr)
