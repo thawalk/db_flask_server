@@ -27,9 +27,9 @@ userlogging_col = pymongo.collection.Collection(userlogging_db,'logging')
 bookdetails_db = pymongo.database.Database(mongo,'extra')
 bookdetails_col = pymongo.collection.Collection(bookdetails_db,'book_details_collection')
 
-print(metadata_col.count())
-print(userlogging_col.count())
-print(bookdetails_col.count())
+# print(metadata_col.count())
+# print(userlogging_col.count())
+# print(bookdetails_col.count())
 
 # metadata_db = mysql.connector.connect(
 #     host ='3.237.43.107',
