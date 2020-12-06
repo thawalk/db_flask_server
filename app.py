@@ -104,10 +104,11 @@ def search_book():
     try:
         title = request.args.get("title")
         author = request.args.get("author")
+        # print(request.args)
+        print(title,author)
         pattern = re.compile(f'({title})', re.I)
         result = bookdetails_col.find({"$or":[{"book_title":{'$regex': pattern}},{"author_names":author}]}).limit(10) #{ $text: { $search: title } }
         temp_result_array = list(result)
-        print(temp_result_array)
         final_result = []
         for data in temp_result_array:
             asin = data['asin']
@@ -212,8 +213,14 @@ def sort_by_genres():
             extra = bookdetails_col.find({'asin':asin}).limit(1)
             extra_details = list(extra)
             # print(extra_details)
-            data['book_title'] = extra_details[0]['book_title'] #'Life of Akmol' #
-            data['author_names'] = extra_details[0]['author_names'] #'Hakim Teo' #
+            try:
+                data['book_title'] = extra_details[0]['book_title'] #'Life of Akmol' #
+            except:
+                data['book_title'] = ""
+            try:
+                data['author_names'] = extra_details[0]['author_names'] #'Hakim Teo' #
+            except:
+                data['author_names'] = ""
             # del data['_id']
             final.append(data)
         # print(final)
