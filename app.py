@@ -37,6 +37,7 @@ print(bookdetails_col.count())
 #     password = '',
 #     database = 'reviews',
 #     )
+
 metadata_db = mysql.connector.connect(
     host = os.getenv("host"),
     user = 'root',
@@ -81,7 +82,7 @@ def get_review_by_ASIN(ASIN):
         user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
         return response
     except Exception as e:
-        errMsg = "An error occurred. Please try again. Error: " + e 
+        errMsg = "An error occurred. Please try again. Error: " + str(e) 
         js = json.dumps(errMsg)
         user_logging(123,datetime.datetime.now().isoformat(),"GET",400)
         response = Response(js, status=400, mimetype='application/json')
@@ -106,6 +107,7 @@ def search_book():
         pattern = re.compile(f'({title})', re.I)
         result = bookdetails_col.find({"$or":[{"book_title":{'$regex': pattern}},{"author_names":author}]}).limit(10) #{ $text: { $search: title } }
         temp_result_array = list(result)
+        print(temp_result_array)
         final_result = []
         for data in temp_result_array:
             asin = data['asin']
@@ -113,7 +115,17 @@ def search_book():
             
             a_list = list(a)
             # print(a_list[0], file=sys.stderr)
+            # if a_list[0]['book_title']!=null:
+            # print(a_list[0]['book_title'])
+            print("data is : "+ data)
+            if(data['book_title'] is None):
+                print("ALERT")
+            if(data['author_names'] is None):
+                print("ALERT")
+            print(data['book_title'])
+            print(data['author_names'])
             a_list[0]['book_title'] = data['book_title']
+            # if 
             a_list[0]['author_names'] = data['author_names']
             final_result.append(a_list[0])
         result_array = dumps(final_result)
@@ -121,8 +133,8 @@ def search_book():
         response = Response(result_array, status=200, mimetype='application/json')
         user_logging(123,datetime.datetime.now().isoformat(),"GET",200)
         return response
-    except:
-        errMsg = "Please include title."
+    except Exception as e:
+        errMsg = "Please include title. ERROR: " + str(e) 
         js = json.dumps(errMsg)
         user_logging(123,datetime.datetime.now().isoformat(),"GET",400)
         response = Response(js, status=400, mimetype='application/json')
@@ -157,8 +169,8 @@ def add_book():
         response = Response(js, status=201, mimetype='application/json')
         user_logging(123,datetime.datetime.now().isoformat(),"POST",201)
         return response
-    except:
-        errMsg = "Please include title, asin, description, price and categories."
+    except Exception as e:
+        errMsg = "Please include title, asin, description, price and categories. ERROR: " + str(e) 
         js = json.dumps(errMsg)
         response = Response(js, status=400, mimetype='application/json')
         user_logging(123,datetime.datetime.now().isoformat(),"POST",400)
@@ -186,8 +198,8 @@ def add_review():
         user_logging(123,datetime.datetime.now().isoformat(),"POST",201)
         return response
     except Exception as e:
-        errMsg = "An error occurred. Please check if you have all fields."
-        js = json.dumps(e)
+        errMsg = "An error occurred. Please check if you have all fields." + str(e)
+        js = json.dumps(errMsg)
         response = Response(js, status=400, mimetype='application/json')
         user_logging(123,datetime.datetime.now().isoformat(),"POST",400)
         return response
@@ -217,7 +229,7 @@ def sort_by_genres():
         return response
     except Exception as e:
         print(e)
-        errMsg = "An error occurred. Please check if you have all fields."
+        errMsg = "An error occurred. Please check if you have all fields." + str(e)
         js = json.dumps(errMsg)
         response = Response(js, status=400, mimetype='application/json')
         user_logging(123,datetime.datetime.now().isoformat(),"GET",400)
@@ -260,7 +272,6 @@ def sort_by_ratings():   #sort by increasing ratings,  decreasing rating
         return response
         
     except Exception as e:
-        print(e)
         errMsg = "An error occurred. Please check if you have all fields." + e
         js = json.dumps(errMsg)
         response = Response(js, status=400, mimetype='application/json')
