@@ -18,7 +18,7 @@ CORS(app)
 load_dotenv()
 
 test_collection='test_collection'
-# mongo = pymongo.MongoClient('mongodb://3.239.125.13:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false')
+# mongo = pymongo.MongoClient('mongodb://3.237.40.86:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false')
 mongo = pymongo.MongoClient('mongodb://{}:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false'.format(os.getenv("mongo_url")))
 metadata_db = pymongo.database.Database(mongo, 'test')
 metadata_col = pymongo.collection.Collection(metadata_db, 'test_collection')
@@ -32,7 +32,7 @@ bookdetails_col = pymongo.collection.Collection(bookdetails_db,'book_details_col
 # print(bookdetails_col.count())
 
 # metadata_db = mysql.connector.connect(
-#     host ='3.237.43.107',
+#     host ='3.237.41.57',
 #     user = 'root',
 #     password = '',
 #     database = 'reviews',
@@ -212,7 +212,7 @@ def sort_by_genres():
             print(asin)
             extra = bookdetails_col.find({'asin':asin}).limit(1)
             extra_details = list(extra)
-            # print(extra_details)
+            print(extra_details)
             try:
                 data['book_title'] = extra_details[0]['book_title'] #'Life of Akmol' #
             except:
@@ -221,7 +221,7 @@ def sort_by_genres():
                 data['author_names'] = extra_details[0]['author_names'] #'Hakim Teo' #
             except:
                 data['author_names'] = ""
-            # del data['_id']
+            del data['_id']
             final.append(data)
         # print(final)
         js = json.dumps(final)
